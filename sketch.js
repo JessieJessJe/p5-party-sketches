@@ -1,8 +1,8 @@
 
 let isSetup = false;
 let me, ppl, shared, canvas;
-let width = 500;
-let height = 500;
+let width = 900;
+let height = 600;
 let avatar = [];
 let paw = [];
 let sprites = [], sprite_paw,sprite_me;
@@ -17,10 +17,10 @@ function preload() {
   
     partyConnect(
       "wss://deepstream-server-1.herokuapp.com",
-      "hello_pawty_1ala",
+      "hello_pawty_1alandla",
       "main",
     () => {
-      console.log("connected!");
+    
     }
   );
 
@@ -194,6 +194,7 @@ function draw() {
         if (p.ready === true){
         sprites[i].position.x = p.x;
         sprites[i].position.y = p.y;
+        sprites[i].scale = Math.min( 0.4 + 0.005 * p.score, 1);
      }
     
     // if(sprites[i].bounce(sprite_paw) === true){     
@@ -214,7 +215,7 @@ OTHER_PLAYERS.bounce((sprite_paw), (someone)=>{
 sprite_me.bounce( sprite_paw, (myself)=>{
     myself.rotation += 100;
     me.score += 1;
-    console.log(me.score)
+   
 
 })
 sprite_me.bounce( OTHER_PLAYERS );
@@ -247,4 +248,16 @@ function keyMove() {
     if (keyIsDown(68)) me.x = Math.min(width, me.x + step );
     if (keyIsDown(83)) me.y = Math.min(height, me.y + step );
     if (keyIsDown(65)) me.x = Math.max(0.0, me.x-step ); 
+}
+
+function onParticipantsChange(){
+  let result = '';
+
+   ppl.forEach( (d)=> {
+    if (d?.score >= 0){
+      result += `<span>player ${d.id}: ${d.score}</span>`;
+    }
+  })
+
+  document.getElementById('board').innerHTML = result;
 }
