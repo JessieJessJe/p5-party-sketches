@@ -54,6 +54,8 @@ const drawMainCanvas = (sketch) =>{
           shared.y = shared.y || height/2;
           shared.rotation = shared.rotation || getRandom(0, 180);
           shared.paw = shared.paw || getRandom(0,5)
+
+       
           
           sketch.frameRate(10);
           canvas = sketch.createCanvas(width, height);
@@ -65,10 +67,13 @@ const drawMainCanvas = (sketch) =>{
           me.id = shared.counts;
           me.score = 0;
           isSetup = true;
+
+        
           
           PLAYERS = new sketch.Group();
           OTHER_PLAYERS = new sketch.Group();
-          
+       
+          //make sure spirte[0] is this player
           sprite_me = createPlayerSprite(me);
           sprites.push(sprite_me);
         
@@ -105,7 +110,10 @@ const drawMainCanvas = (sketch) =>{
 
   
         sketch.background(sketch.color('#efefef'));
+
         keyMove();
+
+        // keyPressed();
       
         if (sketch.partyIsHost()) {
           if(sketch.frameCount % 30 == 0){
@@ -145,18 +153,18 @@ const drawMainCanvas = (sketch) =>{
       sprite_me.bounce( sprite_paw, (myself)=>{
           myself.rotation += 100;
           me.score += 1;
-         
-      
+          console.log(me.score)
+              
       })
       sprite_me.bounce( OTHER_PLAYERS );
       
       
       
-        showPaw();
+      showPaw();
       
-        sketch.drawSprites();
+      sketch.drawSprites();
       
-        sprite_paw.position.y += 1;
+      // sprite_paw.position.y += 1;
       
       
     }//end of draw
@@ -177,11 +185,16 @@ const drawMainCanvas = (sketch) =>{
     function keyMove() {
       let step = 20;
         
-        if (sketch.keyIsDown(87)) me.y = Math.max(0.0, me.y-step ); 
-        if (sketch.keyIsDown(68)) me.x = Math.min(width, me.x + step );
-        if (sketch.keyIsDown(83)) me.y = Math.min(height, me.y + step );
-        if (sketch.keyIsDown(65)) me.x = Math.max(0.0, me.x-step ); 
-    }
+        if (sketch.keyIsDown(87)){  sprite_me.rotation= -90 ;  
+          me.y = Math.max(0.0, me.y-step ); }
+        if (sketch.keyIsDown(68)){  sprite_me.rotation= 0 ;  
+          me.x = Math.min(width, me.x + step );}
+        if (sketch.keyIsDown(83)){  sprite_me.rotation= 90 ;  
+          me.y = Math.min(height, me.y + step );}
+
+        if (sketch.keyIsDown(65)){ sprite_me.rotation= 180 ;  
+           me.x = Math.max(0.0, me.x-step );}
+   }
 
 
       function addPeople(){
@@ -238,6 +251,18 @@ const drawMainCanvas = (sketch) =>{
       
       }
 
+      function keyPressed() {
+        let step = 20;
+          
+        switch(sketch.key) {   
+          case 'w': me.y = Math.max(0.0, me.y-step ); break;
+          case 'd': me.x = Math.min(width, me.x + step );break;    
+          case 's': me.y = Math.min(height, me.y + step );break;
+          case 'a': me.x = Math.max(0.0, me.x-step ); break;
+        }
+      
+      }
+
 }//end of main canvas sketch
 
 
@@ -267,7 +292,7 @@ const drawScoreCanvas = function(sketch){
       if (p?.ready){
 
         let w = score_to_width(p.score);
-        let s = `Fish No.${p.id}`;
+        let s = p.id === me.id ? `Fish No.${p.id} (that's you!)` : `Fish No.${p.id}`;
   
         sketch.fill(0);
         sketch.text(s, 0, padding * (i+1) * 2 - padding);  
