@@ -27,6 +27,7 @@ const drawMainCanvas = (sketch) =>{
               }
             );
 
+            
 
             me = sketch.partyLoadMyShared();
             ppl = sketch.partyLoadParticipantShareds();
@@ -47,6 +48,7 @@ const drawMainCanvas = (sketch) =>{
       }//end of preload
 
       sketch.setup = function(){
+          sketch.partyToggleInfo(false);
   
           shared.counts = shared.counts || 0;
           shared.counts += 1;
@@ -64,7 +66,7 @@ const drawMainCanvas = (sketch) =>{
           me.y = me.y || height/2 + (Math.random()-1) * 100;
           me.avatar = me.avatar || getRandom(0,2);   
           // if index === 0, will be false then overwrite 0 through get random???
-          
+
           me.id = me.id || shared.counts;
           me.score = me.score || 0;
           isSetup = true;
