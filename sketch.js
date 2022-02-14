@@ -60,31 +60,38 @@ const drawMainCanvas = (sketch) =>{
           sketch.frameRate(10);
           canvas = sketch.createCanvas(width, height);
          
-          me.x = width/2 + (Math.random()-1) * 100;
-          me.y = height/2 + (Math.random()-1) * 100;
-          me.avatar = getRandom(0,2);   
-          me.ready = true;
-          me.id = shared.counts;
-          me.score = 0;
+          me.x = me.x || width/2 + (Math.random()-1) * 100;
+          me.y = me.y || height/2 + (Math.random()-1) * 100;
+          me.avatar = me.avatar || getRandom(0,2);   
+          // if index === 0, will be false then overwrite 0 through get random???
+          
+          me.id = me.id || shared.counts;
+          me.score = me.score || 0;
           isSetup = true;
+          me.ready = true;
 
-        
+
+          let index;
+          ppl.forEach((p, i)=>{
+          if (p.id === me.id){ index = i;}
+          })
+
           
           PLAYERS = new sketch.Group();
           OTHER_PLAYERS = new sketch.Group();
        
-          //make sure spirte[0] is this player
-          sprite_me = createPlayerSprite(me);
-          sprites.push(sprite_me);
+
+          sprite_me = createPlayerSprite(me, index);
+        
         
         //creating sprites for all plays except me
-          for(let p of ppl){
+          for(let [i,p] of ppl.entries()){
             
             if (p.ready === true && me.id !== p.id){
                   
-              let s = createPlayerSprite(p);
+              let s = createPlayerSprite(p, i);
               OTHER_PLAYERS.add(s)
-              sprites.push(s)
+          
              }     
                 
           }
@@ -96,7 +103,7 @@ const drawMainCanvas = (sketch) =>{
           sprite_paw.addAnimation('normal', `assets/paw1.png`,`assets/paw2.png`,`assets/paw3.png`,`assets/paw4.png`,`assets/paw5.png`,`assets/paw6.png`)  
         
           sprite_paw.animation.playing = false;
-          sprite_paw.setVelocity(10, 0);
+          sprite_paw.setVelocity(0, 10);
       
           // sprite_paw.setCollider('circle', 0, 0, 50);
         
@@ -128,21 +135,20 @@ const drawMainCanvas = (sketch) =>{
         }else{
             
         for(let [i,p] of ppl.entries()){
-          if (p !== undefined){
-              if (p.ready === true){
+          if (p?.ready){
+              if (p.id !== me.id){
               sprites[i].position.x = p.x;
               sprites[i].position.y = p.y;
               sprites[i].scale = Math.min( 0.4 + 0.005 * p.score, 1);
            }
-          
-          // if(sprites[i].bounce(sprite_paw) === true){     
-          //      sprites[i].rotation += 100;
-        
-          // }
-            
-          }
+         }
           
         }
+
+        sprite_me.position.x = me.x;
+        sprite_me.position.y = me.y;
+        sprite_me.scale = Math.min( 0.4 + 0.005 * me.score, 1);
+
       
         }//end of updating positions
       
@@ -153,7 +159,6 @@ const drawMainCanvas = (sketch) =>{
       sprite_me.bounce( sprite_paw, (myself)=>{
           myself.rotation += 100;
           me.score += 1;
-          console.log(me.score)
               
       })
       sprite_me.bounce( OTHER_PLAYERS );
@@ -170,12 +175,13 @@ const drawMainCanvas = (sketch) =>{
     }//end of draw
 
 
-    function createPlayerSprite(p){
+    function createPlayerSprite(p,index){
 
       let s = sketch.createSprite(p.x, p.y,50, 50)
       s.addAnimation('normal', avatar[p.avatar][0],avatar[p.avatar][1] );
       s.scale = 0.5
-     
+
+      sprites[index] = s; 
       PLAYERS.add(s);
     
       return s;
@@ -205,9 +211,9 @@ const drawMainCanvas = (sketch) =>{
         
         if (p.ready === true && i >= current){
           
-            let s = createPlayerSprite(p);
+            let s = createPlayerSprite(p, i);
             OTHER_PLAYERS.add(s)
-            sprites.push(s)
+            
             
         }
       }
